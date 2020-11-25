@@ -1,7 +1,11 @@
+use anyhow::{Context, Result};
 use env_logger::Env;
+use lib::db::{MysqlNoteStore, NoteStore};
+use lib::get_routes;
 use log::info;
 use structopt::StructOpt;
-use warp::Filter;
+
+mod lib;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -9,6 +13,9 @@ use warp::Filter;
     about = "An App for keeping track of my thoughts in a semi-structued way"
 )]
 struct Args {
+    /// Database URL to connect to
+    #[structopt(long, default_value = "jdbc:mysql://localhost:3306/test")]
+    database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
     debug: bool,
@@ -18,9 +25,8 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let args = Args::from_args();
-
     // Setup Logging
     if args.debug {
         // If both RUST_LOG env variable and debug are given, choose env variable
@@ -29,11 +35,13 @@ async fn main() {
         env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     }
 
-    // GET /hello/warp => 200 OK with body "Hello, warp!"
-    let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
+    // Initialize Database
+    info!("Connecting to database at url: {}", args.database_url);
+    let note_store = MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
 
+    let routes = get_routes();
     info!("Running server on port {}", args.port);
-
     // Start Server
-    warp::serve(hello).run(([127, 0, 0, 1], args.port)).await;
+    warp::serve(routes).run(([127, 0, 0, 1], args.port)).await;
+    Ok(())
 }
