@@ -1,7 +1,7 @@
 # Dockerfile for creating a statically-linked Rust application using docker's
 # multi-stage build feature. This also leverages the docker build cache to avoid
 # re-downloading dependencies if they have not changed.
-FROM rust:1.48.0 AS build
+FROM clux/muslrust:stable AS build
 WORKDIR /usr/src
 
 # Download the target for static linking.
@@ -12,21 +12,19 @@ RUN rustup target add x86_64-unknown-linux-musl
 # we can use the docker build cache and skip these (typically slow) steps.
 RUN USER=root cargo new notes
 WORKDIR /usr/src/notes
-COPY Cargo.toml Cargo.lock ./
-RUN cargo build --release
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        gcc \ 
-	openssl \
-	libssl-dev
+# Copy Cargo files
+COPY Cargo.toml Cargo.lock ./
 
 # Copy the source and build the application.
 COPY src ./src
 
-RUN cargo install --target x86_64-unknown-linux-musl --path .
+RUN cargo build --release
+RUN cargo install --target x86_64-unknown-linux-musl --path . --root /usr/local/
 
 # Copy the statically-linked binary into a scratch container.
-FROM scratch
-COPY --from=build /usr/local/cargo/bin/notes .
+FROM debian:jessie
+RUN apt-get update && apt-get install -y libmysqlclient-dev
+COPY --from=build /usr/local/bin/notes .
 USER 1000
 CMD ["./notes"]

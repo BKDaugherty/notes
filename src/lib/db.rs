@@ -1,10 +1,11 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use mysql_async::Pool;
+use mysql_async::prelude::Queryable;
 use uuid::Uuid;
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct Note {
-    pub id: Uuid,
+    pub uuid: Uuid,
     pub name: String,
 }
 
@@ -20,8 +21,23 @@ pub struct MysqlNoteStore {
 
 impl MysqlNoteStore {
     pub fn new(db_url: String) -> Result<MysqlNoteStore> {
-        let connection_pool = mysql_async::Pool::new(db_url);
+        let connection_pool = mysql_async::Pool::from_url(db_url).context("Creating mysql pool")?;
         Ok(MysqlNoteStore { connection_pool })
+    }
+
+    // temporary
+    pub async fn init(&self) -> Result<()> {
+        let mut conn = self.connection_pool.get_conn().await?;
+
+        // Create temporary table
+        conn.query_drop(
+            r"CREATE TABLE IF NOT EXISTS notes (
+              uuid VARCHAR(36) not null,
+              name text not null
+             )",
+        )
+            .await?;
+	Ok(())
     }
 }
 

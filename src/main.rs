@@ -14,7 +14,7 @@ mod lib;
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, default_value = "jdbc:mysql://localhost:3306/test")]
+    #[structopt(long, default_value = "mysql://localhost:3306/test")]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
@@ -38,6 +38,7 @@ async fn main() -> Result<()> {
     // Initialize Database
     info!("Connecting to database at url: {}", args.database_url);
     let note_store = MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
+    note_store.init().await?;
 
     let routes = get_routes();
     info!("Running server on port {}", args.port);
