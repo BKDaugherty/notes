@@ -14,7 +14,7 @@ mod lib;
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, default_value = "mysql://localhost:3306/test")]
+    #[structopt(long, default_value = "mysql://(host=localhost,port=3306,user=root,password=password)/test")]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]

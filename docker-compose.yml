@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  web:
+    image: brendond/rust-web
+    restart: always
+    ports:
+      - 9001:9001
+    depends_on:
+      - "db"
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+
