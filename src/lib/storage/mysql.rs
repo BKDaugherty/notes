@@ -20,7 +20,7 @@ impl NoteStore for MysqlNoteStore {
         Ok(Note::default())
     }
 
-    fn store_note(&self, _note: Note) -> Result<()> {
+    fn store_note(&mut self, _note: Note) -> Result<()> {
         Ok(())
     }
 }

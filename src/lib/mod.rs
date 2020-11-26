@@ -1,4 +1,4 @@
 pub mod routes;
+pub mod service;
 pub mod storage;
 pub mod types;
-pub use routes::get_routes;

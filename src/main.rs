@@ -1,7 +1,8 @@
 use anyhow::{Context, Result};
 use clap::arg_enum;
 use env_logger::Env;
-use lib::get_routes;
+use lib::routes::build_warp_routes;
+use lib::service::{NotesService, RequestHandler};
 use lib::storage::{MemoryNoteStore, MysqlNoteStore, NoteStore};
 use log::info;
 use structopt::StructOpt;
@@ -50,7 +51,7 @@ async fn main() -> Result<()> {
     }
 
     // Initialize Storage Layer
-    let _storage = match args.storage_type {
+    let storage = match args.storage_type {
         Storage::Mysql => {
             info!("Connecting to database at url: {}", args.database_url);
             let note_store =
@@ -63,7 +64,9 @@ async fn main() -> Result<()> {
         }
     };
 
-    let routes = get_routes();
+    let handler = Box::new(RequestHandler::new(storage)) as Box<dyn NotesService>;
+    let routes = build_warp_routes(handler);
+
     info!("Running server on port {}", args.port);
     // Start Server
     warp::serve(routes).run(([127, 0, 0, 1], args.port)).await;

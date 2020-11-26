@@ -1,6 +1,6 @@
 use super::traits::NoteStore;
 use crate::lib::types::Note;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -17,11 +17,12 @@ impl MemoryNoteStore {
 }
 
 impl NoteStore for MemoryNoteStore {
-    fn get_note(&self, _id: Uuid) -> Result<Note> {
-        Ok(Note::default())
+    fn get_note(&self, id: Uuid) -> Result<Note> {
+	self.storage.get(&id).context(format!("Looking for id {}", id)).map(|x| x.clone())
     }
-
-    fn store_note(&self, _note: Note) -> Result<()> {
+    
+    fn store_note(&mut self, note: Note) -> Result<()> {
+	self.storage.insert(note.uuid.clone(), note).context("Setting Note")?;
         Ok(())
     }
 }
