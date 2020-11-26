@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 /// A note represents a concept or idea
 pub struct Note {
     /// Unique id for this entry
@@ -16,13 +17,21 @@ pub struct Note {
     pub tags: HashSet<Tag>,
     pub create_time: Option<String>,
     pub last_update_time: Option<String>,
-    pub delete_time: Option<String>
+    pub delete_time: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct NoteCreateRequest {
+    pub title: String,
+    pub description: Option<String>,
+    pub origin: Option<String>,
+    pub tags: Option<HashSet<Tag>>,
 }
 
 /// A list or collection of notes can be used to prioritize
 /// or collect various things into a group.
 /// Common examples are
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct List {
     pub uuid: Uuid,
     /// Vector of Uuid's to different Notes in the list
@@ -30,13 +39,13 @@ pub struct List {
     /// Title of the list
     pub title: String,
     /// Optional text that can provide any other information you'd like about this list
-    pub description: Option<String>
+    pub description: Option<String>,
 }
 
 /// List of tags that can be associated with a Note
 /// This is explicitly encoded as a rust enum, because I don't
 /// want it to be easily added to. Keeping a limited set of tags is important
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Tag {
     // Medium Based
     Article,
@@ -48,7 +57,7 @@ pub enum Tag {
     Career,
     Entertainment,
     Productivity,
-    
+
     // Topic based
     ArtificialIntelligence,
     EffectiveAltruism,
