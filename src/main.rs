@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use clap::arg_enum;
 use env_logger::Env;
 use lib::db::{MysqlNoteStore, NoteStore};
 use lib::get_routes;
@@ -7,6 +8,14 @@ use structopt::StructOpt;
 
 mod lib;
 
+arg_enum! {
+    #[derive(StructOpt, PartialEq, Debug)]
+    pub enum Storage {
+        Mysql,
+        Memory,
+    }
+}
+
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "notes",
@@ -14,7 +23,10 @@ mod lib;
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, default_value = "mysql://(host=localhost,port=3306,user=root,password=password)/test")]
+    #[structopt(
+        long,
+        default_value = "mysql://(host=db,port=3306,user=root,password=password)/test"
+    )]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
@@ -22,6 +34,8 @@ struct Args {
     /// Port to listen on
     #[structopt(short, long, default_value = "9001")]
     port: u16,
+    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="mysql")]
+    storage_type: Storage,
 }
 
 #[tokio::main]

@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
-use mysql_async::Pool;
+use log::info;
 use mysql_async::prelude::Queryable;
+use mysql_async::Pool;
 use uuid::Uuid;
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
@@ -27,17 +28,22 @@ impl MysqlNoteStore {
 
     // temporary
     pub async fn init(&self) -> Result<()> {
-        let mut conn = self.connection_pool.get_conn().await?;
-
-        // Create temporary table
+        let mut conn = self
+            .connection_pool
+            .get_conn()
+            .await
+            .context("Connecting to DB")?;
+        info!("Initializing DB");
+        // Create table
         conn.query_drop(
             r"CREATE TABLE IF NOT EXISTS notes (
               uuid VARCHAR(36) not null,
               name text not null
              )",
         )
-            .await?;
-	Ok(())
+        .await
+        .context("Running create table")?;
+        Ok(())
     }
 }
 
