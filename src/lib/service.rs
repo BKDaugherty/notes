@@ -15,21 +15,21 @@ impl RequestHandler {
 }
 
 impl NotesService for RequestHandler {
-    fn create_note(&self, note: Note) -> Result<()> {
-        todo!()
+    fn create_note(&mut self, note: Note) -> Result<()> {
+	self.storage.store_note(note)
     }
     fn get_note(&self, note_id: Uuid) -> Result<Note> {
-        todo!()
+	self.storage.get_note(note_id)
     }
-    fn update_note(&self, note_id: Uuid, note: Note) -> Result<()> {
-        todo!()
+    fn update_note(&mut self, _note_id: Uuid, note: Note) -> Result<()> {
+	self.storage.store_note(note)
     }
 }
 
 pub trait NotesService {
-    fn create_note(&self, note: Note) -> Result<()>;
+    fn create_note(&mut self, note: Note) -> Result<()>;
     fn get_note(&self, note_id: Uuid) -> Result<Note>;
-    fn update_note(&self, note_id: Uuid, note: Note) -> Result<()>;
+    fn update_note(&mut self, note_id: Uuid, note: Note) -> Result<()>;
 }
 
 

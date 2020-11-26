@@ -35,7 +35,7 @@ struct Args {
     /// Port to listen on
     #[structopt(short, long, default_value = "9001")]
     port: u16,
-    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="mysql")]
+    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="memory")]
     storage_type: Storage,
 }
 
