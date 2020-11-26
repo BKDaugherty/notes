@@ -1,8 +1,8 @@
 use anyhow::{Context, Result};
 use clap::arg_enum;
 use env_logger::Env;
-use lib::db::{MysqlNoteStore, NoteStore};
 use lib::get_routes;
+use lib::storage::{MemoryNoteStore, MysqlNoteStore, NoteStore};
 use log::info;
 use structopt::StructOpt;
 
@@ -49,10 +49,19 @@ async fn main() -> Result<()> {
         env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     }
 
-    // Initialize Database
-    info!("Connecting to database at url: {}", args.database_url);
-    let note_store = MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
-    note_store.init().await?;
+    // Initialize Storage Layer
+    let _storage = match args.storage_type {
+        Storage::Mysql => {
+            info!("Connecting to database at url: {}", args.database_url);
+            let note_store =
+                MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
+            Box::new(note_store) as Box<dyn NoteStore>
+        }
+        Storage::Memory => {
+            info!("Using Memory Storage. Note, no notes will be saved!");
+            Box::new(MemoryNoteStore::new()) as Box<dyn NoteStore>
+        }
+    };
 
     let routes = get_routes();
     info!("Running server on port {}", args.port);
