@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use mysql_async::Pool;
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct MysqlNoteStore {
     connection_pool: Pool,
 }

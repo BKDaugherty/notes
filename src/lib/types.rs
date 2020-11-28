@@ -15,18 +15,11 @@ pub struct Note {
     pub origin: Option<String>,
     /// Tags assciated with this content
     pub tags: HashSet<Tag>,
-    pub create_time: Option<String>,
-    pub last_update_time: Option<String>,
+    pub create_time: String,
+    pub last_update_time: String,
     pub delete_time: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
-pub struct NoteCreateRequest {
-    pub title: String,
-    pub description: Option<String>,
-    pub origin: Option<String>,
-    pub tags: Option<HashSet<Tag>>,
-}
 
 /// A list or collection of notes can be used to prioritize
 /// or collect various things into a group.
@@ -65,4 +58,39 @@ pub enum Tag {
     // Meta based
     RecommendedBy(String),
     RemindsMeOf(String),
+}
+
+// API Interface
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct CreateNoteRequest {
+    pub title: String,
+    pub description: Option<String>,
+    pub origin: Option<String>,
+    pub tags: Option<HashSet<Tag>>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct CreateNoteResponse {
+    pub note_id: Uuid
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct GetNoteRequest {
+    pub note_id: Uuid
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct GetNoteResponse {
+    pub note: Note
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct UpdateNoteRequest {
+    pub note_id: Uuid,
+    pub note: Note
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct UpdateNoteResponse {
+    
 }
