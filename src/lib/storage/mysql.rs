@@ -16,7 +16,7 @@ impl MysqlNoteStore {
     }
 }
 
-impl NoteStore for MysqlNoteStore {
+/*impl NoteStore for MysqlNoteStore {
     fn get_note(&self, _id: Uuid) -> Result<Note> {
         Ok(Note::default())
     }
@@ -24,4 +24,4 @@ impl NoteStore for MysqlNoteStore {
     fn store_note(&mut self, _note: Note) -> Result<()> {
         Ok(())
     }
-}
+}*/

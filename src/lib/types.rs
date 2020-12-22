@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
@@ -9,6 +9,8 @@ pub struct Note {
     pub uuid: Uuid,
     /// The title of this entry
     pub title: String,
+    /// The owner of this note
+    pub owner: String,
     /// Optional description about this entry
     pub description: Option<String>,
     /// Where you heard about this
@@ -31,6 +33,8 @@ pub struct List {
     pub notes: Vec<Uuid>,
     /// Title of the list
     pub title: String,
+    /// The owner of this list
+    pub owner: String,
     /// Optional text that can provide any other information you'd like about this list
     pub description: Option<String>,
 }
@@ -67,16 +71,27 @@ pub struct CreateNoteRequest {
     pub description: Option<String>,
     pub origin: Option<String>,
     pub tags: Option<HashSet<Tag>>,
+    pub owner: String,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct CreateNoteResponse {
-    pub note_id: Uuid
+    pub note_id: Uuid,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNoteRequest {
     pub note_id: Uuid
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct GetNotesRequest {
+    pub owner : String
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct GetNotesResponse {
+    pub notes: HashMap<Uuid, Note>
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
@@ -86,8 +101,12 @@ pub struct GetNoteResponse {
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct UpdateNoteRequest {
+    /// note to update
     pub note_id: Uuid,
-    pub note: Note
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub origin: Option<String>,
+    pub tags: Option<HashSet<Tag>>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
