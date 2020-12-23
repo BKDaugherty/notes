@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
             };
 
             info!("Running server on port {}", port);
-            warp::serve(routes).run(([127, 0, 0, 1], port)).await;
+            warp::serve(routes).run(([0, 0, 0, 0], port)).await;
         }
     };
     Ok(())
