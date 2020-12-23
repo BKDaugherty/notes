@@ -55,7 +55,7 @@ async fn main() -> Result<()> {
     // TODO --> Can I make these not required to be clone?
     match args.storage_type {
         Storage::Mysql => {
-	    todo!();
+            todo!();
             /*info!("Connecting to database at url: {}", args.database_url);
             let note_store =
                 MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
@@ -68,8 +68,20 @@ async fn main() -> Result<()> {
             info!("Using Memory Storage. Note, no notes will be saved!");
             let handler = RequestHandler::new(MemoryNoteStore::new());
             let routes = build_warp_routes(handler);
-            info!("Running server on port {}", args.port);
-            warp::serve(routes).run(([127, 0, 0, 1], args.port)).await;
+
+            let mut port = match env::var("PORT") {
+                Ok(port) => {
+                    info!(
+                        "Port set in environment variable {}. Overwriting {}",
+                        port, args.port
+                    );
+                    port
+                }
+                Err(e) => args.port,
+            };
+
+            info!("Running server on port {}", port);
+            warp::serve(routes).run(([127, 0, 0, 1], port)).await;
         }
     };
     Ok(())
