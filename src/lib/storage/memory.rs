@@ -1,7 +1,7 @@
 use super::traits::NoteStore;
 use crate::lib::types::{List, Note};
 use anyhow::{Context, Result};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 

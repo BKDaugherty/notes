@@ -8,7 +8,10 @@ set -e
 # thanks to it we can just enter `./scripts/run-tests.bash`
 cd "${0%/*}/.."
 
-# let's fake failing test for now 
 echo "Running tests"
-echo "............................" 
-echo "Failed!" && exit 1
+
+# Ensure the application builds
+cargo build
+
+# Run tests
+cargo test

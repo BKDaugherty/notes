@@ -5,6 +5,7 @@ use lib::routes::build_warp_routes;
 use lib::service::RequestHandler;
 use lib::storage::{MemoryNoteStore, MysqlNoteStore};
 use log::info;
+use std::env;
 use structopt::StructOpt;
 
 mod lib;
@@ -69,15 +70,15 @@ async fn main() -> Result<()> {
             let handler = RequestHandler::new(MemoryNoteStore::new());
             let routes = build_warp_routes(handler);
 
-            let mut port = match env::var("PORT") {
+            let port = match env::var("PORT") {
                 Ok(port) => {
                     info!(
                         "Port set in environment variable {}. Overwriting {}",
                         port, args.port
                     );
-                    port
+                    port.parse::<u16>().context("ENV Port is not a u16?!")?
                 }
-                Err(e) => args.port,
+                Err(..) => args.port,
             };
 
             info!("Running server on port {}", port);

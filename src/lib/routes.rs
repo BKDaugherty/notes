@@ -1,8 +1,6 @@
 use crate::lib::service::{NotesService, RequestHandler};
 use crate::lib::storage::NoteStore;
-use crate::lib::types::{
-    CreateNoteRequest, GetNoteRequest, GetNotesRequest, Note, UpdateNoteRequest,
-};
+use crate::lib::types::{CreateNoteRequest, GetNoteRequest, GetNotesRequest, UpdateNoteRequest};
 use log::info;
 use uuid::Uuid;
 use warp::{filters::BoxedFilter, http, Filter, Reply};
@@ -88,6 +86,11 @@ pub fn build_warp_routes<S: NoteStore>(handler: RequestHandler<S>) -> BoxedFilte
         .and(handler_filter.clone())
         .and_then(get_notes);
 
-    let routes = create.or(get_note).or(update_note).or(get_notes).with(cors).boxed();
+    let routes = create
+        .or(get_note)
+        .or(update_note)
+        .or(get_notes)
+        .with(cors)
+        .boxed();
     routes
 }
