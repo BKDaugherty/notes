@@ -58,6 +58,7 @@ pub enum Tag {
     // Topic based
     ArtificialIntelligence,
     EffectiveAltruism,
+    SocialJustice,
 
     // Meta based
     RecommendedBy(String),
