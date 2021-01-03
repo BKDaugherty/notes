@@ -1,6 +1,9 @@
 use crate::lib::service::{NotesService, RequestHandler};
 use crate::lib::storage::NoteStore;
-use crate::lib::types::{CreateNoteRequest, GetNoteRequest, GetNotesRequest, UpdateNoteRequest};
+use crate::lib::types::{
+    ArchiveNoteRequest, CreateNoteRequest, GetNoteRequest, GetNotesRequest,
+    UpdateNoteRequest,
+};
 use log::info;
 use uuid::Uuid;
 use warp::{filters::BoxedFilter, http, Filter, Reply};
@@ -40,6 +43,17 @@ async fn update_note<S: NoteStore>(
     Ok(warp::reply::json(&response))
 }
 
+async fn archive_note<S: NoteStore>(
+    uuid: Uuid,
+    mut handler: RequestHandler<S>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    info!("Archiving {}", uuid);
+    let response = handler
+        .archive_note(ArchiveNoteRequest { note_id: uuid })
+        .expect("Should be able to archive note");
+    Ok(warp::reply::json(&response))
+}
+
 async fn get_notes<S: NoteStore>(
     owner: String,
     handler: RequestHandler<S>,
@@ -72,6 +86,13 @@ pub fn build_warp_routes<S: NoteStore>(handler: RequestHandler<S>) -> BoxedFilte
         .and(handler_filter.clone())
         .and_then(get_note);
 
+    let archive_note = warp::put()
+        .and(warp::path("note"))
+        .and(warp::path("archive"))
+        .and(warp::path::param::<Uuid>())
+        .and(handler_filter.clone())
+        .and_then(archive_note);
+
     let update_note = warp::put()
         .and(warp::path("note"))
         .and(warp::path::param::<Uuid>())
@@ -90,6 +111,7 @@ pub fn build_warp_routes<S: NoteStore>(handler: RequestHandler<S>) -> BoxedFilte
         .or(get_note)
         .or(update_note)
         .or(get_notes)
+	.or(archive_note)
         .with(cors)
         .boxed();
     routes

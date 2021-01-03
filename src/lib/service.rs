@@ -1,9 +1,10 @@
 use crate::lib::storage::NoteStore;
 use crate::lib::types::{
-    CreateNoteRequest, CreateNoteResponse, GetNoteRequest, GetNoteResponse, GetNotesRequest,
-    GetNotesResponse, Note, Tag, UpdateNoteRequest, UpdateNoteResponse,
+    ArchiveNoteRequest, ArchiveNoteResponse, CreateNoteRequest, CreateNoteResponse, GetNoteRequest,
+    GetNoteResponse, GetNotesRequest, GetNotesResponse, Note, Tag, UpdateNoteRequest,
+    UpdateNoteResponse,
 };
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use chrono;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -60,6 +61,21 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
         Ok(GetNotesResponse { notes })
     }
 
+    fn archive_note(&mut self, request: ArchiveNoteRequest) -> Result<ArchiveNoteResponse> {
+        let mut note = self
+            .storage
+            .get_note(request.note_id)
+            .context("getting note to update")?;
+        if let Some(..) = note.delete_time {
+            return Err(anyhow!("Attempting to archive deleted note {:?}", note));
+        }
+        note.delete_time = Some(format!("{}", chrono::offset::Utc::now().timestamp()));
+        self.storage
+            .store_note(note)
+            .context("Attempting to update note")?;
+        Ok(ArchiveNoteResponse {})
+    }
+
     fn update_note(&mut self, request: UpdateNoteRequest) -> Result<UpdateNoteResponse> {
         // Get note from storage
         let mut note = self
@@ -91,4 +107,5 @@ pub trait NotesService: Send + Sync + Clone + 'static {
     fn get_note(&self, request: GetNoteRequest) -> Result<GetNoteResponse>;
     fn get_notes(&self, request: GetNotesRequest) -> Result<GetNotesResponse>;
     fn update_note(&mut self, request: UpdateNoteRequest) -> Result<UpdateNoteResponse>;
+    fn archive_note(&mut self, request: ArchiveNoteRequest) -> Result<ArchiveNoteResponse>;
 }

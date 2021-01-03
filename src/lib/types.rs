@@ -93,6 +93,14 @@ pub struct GetNotesResponse {
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct ArchiveNoteRequest {
+    pub note_id: Uuid,
+}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct ArchiveNoteResponse {}
+
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNoteResponse {
     pub note: Note,
 }
