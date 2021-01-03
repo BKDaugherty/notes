@@ -8,15 +8,12 @@ use log::info;
 use std::env;
 use structopt::StructOpt;
 
-#[macro_use]
-extern crate diesel;
-
 mod lib;
 
 arg_enum! {
     #[derive(StructOpt, PartialEq, Debug)]
     pub enum Storage {
-    Psql,
+	Psql,
         Memory,
     }
 }

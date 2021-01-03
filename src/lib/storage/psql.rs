@@ -1,35 +1,26 @@
 use super::traits::NoteStore;
 use crate::lib::types::{FullList, List, Note};
 use anyhow::{Context, Result};
-use mobc::{Connection, Pool};
-use mobc_postgres::{tokio_postgres, PgConnectionManager};
+use diesel::pg::PgConnection;
+use diesel::r2d2::{ Pool, PooledConnection, ConnectionManager, PoolError };
+use diesel::r2d2;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::time::Duration;
-use tokio_postgres::{Config, Error, NoTls};
 use uuid::Uuid;
 
-pub type DBCon = Connection<PgConnectionManager<NoTls>>;
-pub type DBPool = Pool<PgConnectionManager<NoTls>>;
+pub type DBPool = Pool<ConnectionManager<PgConnection>>;
+pub type DBCon = PooledConnection<ConnectionManager<PgConnection>>;
 
-// ELMOS MAGIC NUMBERS - THANKS INTERNET
-const DB_POOL_MAX_OPEN: u64 = 32;
-const DB_POOL_MAX_IDLE: u64 = 8;
-const DB_POOL_TIMEOUT_SECONDS: u64 = 15;
-
-pub fn create_pool(psql_str: &str) -> std::result::Result<DBPool, mobc::Error<Error>> {
-    let config = Config::from_str(psql_str)?;
-
-    let manager = PgConnectionManager::new(config, NoTls);
-    Ok(Pool::builder()
-        .max_open(DB_POOL_MAX_OPEN)
-        .max_idle(DB_POOL_MAX_IDLE)
-        .get_timeout(Some(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS)))
-        .build(manager))
+pub fn create_pool(psql_str: &str) -> std::result::Result<DBPool, PoolError> {
+    let manager = ConnectionManager::<PgConnection>::new(psql_str);
+    Pool::builder()
+        .build(manager)
 }
 
-pub async fn get_db_con(db_pool: &DBPool) -> Result<DBCon, mobc::Error<tokio_postgres::Error>> {
-    db_pool.get().await
+// TODO Make this async
+pub fn get_db_con(db_pool: &DBPool) -> Result<DBCon, PoolError> {
+    db_pool.get()
 }
 
 #[derive(Clone)]

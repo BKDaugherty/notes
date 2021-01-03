@@ -1,8 +1,9 @@
+use diesel::deserialize::Queryable;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, Deserialize, Queryable, Serialize)]
 /// A note represents a concept or idea
 pub struct Note {
     /// Unique id for this entry
