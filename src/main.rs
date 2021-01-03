@@ -3,7 +3,7 @@ use clap::arg_enum;
 use env_logger::Env;
 use lib::routes::build_warp_routes;
 use lib::service::RequestHandler;
-use lib::storage::{MemoryNoteStore, MysqlNoteStore};
+use lib::storage::{MemoryNoteStore, PsqlNoteStore};
 use log::info;
 use std::env;
 use structopt::StructOpt;
@@ -13,7 +13,7 @@ mod lib;
 arg_enum! {
     #[derive(StructOpt, PartialEq, Debug)]
     pub enum Storage {
-        Mysql,
+    Psql,
         Memory,
     }
 }
@@ -25,10 +25,7 @@ arg_enum! {
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(
-        long,
-        default_value = "mysql://(host=db,port=3306,user=root,password=password)/test"
-    )]
+    #[structopt(long, default_value = "postgres://postgres@127.0.0.1:7878/postgres")]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
@@ -51,36 +48,33 @@ async fn main() -> Result<()> {
         env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     }
 
+    let port = match env::var("PORT") {
+        Ok(port) => {
+            info!(
+                "Port set in environment variable {}. Overwriting {}",
+                port, args.port
+            );
+            port.parse::<u16>().context("ENV Port is not a u16?!")?
+        }
+        Err(..) => args.port,
+    };
+
     // Run the service. Because we can't return different types, and we can't make
     // things trait objects either, we run the code in a weird way.
     // TODO --> Can I make these not required to be clone?
     match args.storage_type {
-        Storage::Mysql => {
-            todo!();
-            /*info!("Connecting to database at url: {}", args.database_url);
-            let note_store =
-                MysqlNoteStore::new(args.database_url).context("Initializing Database")?;
+        Storage::Psql => {
+            info!("Connecting to database at url: {}", args.database_url);
+            let note_store = PsqlNoteStore::new(&args.database_url);
             let handler = RequestHandler::new(note_store);
             let routes = build_warp_routes(handler);
-            info!("Running server on port {}", args.port);
-            warp::serve(routes).run(([127, 0, 0, 1], args.port)).await;*/
+            info!("Running server on port {}", port);
+            warp::serve(routes).run(([0, 0, 0, 0], port)).await;
         }
         Storage::Memory => {
             info!("Using Memory Storage. Note, no notes will be saved!");
             let handler = RequestHandler::new(MemoryNoteStore::new());
             let routes = build_warp_routes(handler);
-
-            let port = match env::var("PORT") {
-                Ok(port) => {
-                    info!(
-                        "Port set in environment variable {}. Overwriting {}",
-                        port, args.port
-                    );
-                    port.parse::<u16>().context("ENV Port is not a u16?!")?
-                }
-                Err(..) => args.port,
-            };
-
             info!("Running server on port {}", port);
             warp::serve(routes).run(([0, 0, 0, 0], port)).await;
         }

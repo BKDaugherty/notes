@@ -1,7 +1,7 @@
 mod memory;
-mod mysql;
+mod psql;
 mod traits;
 
 pub use memory::MemoryNoteStore;
-pub use mysql::MysqlNoteStore;
+pub use psql::PsqlNoteStore;
 pub use traits::NoteStore;

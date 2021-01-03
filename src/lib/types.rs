@@ -13,15 +13,12 @@ pub struct Note {
     pub owner: String,
     /// Optional description about this entry
     pub description: Option<String>,
-    /// Where you heard about this
-    pub origin: Option<String>,
     /// Tags assciated with this content
     pub tags: HashSet<Tag>,
     pub create_time: String,
     pub last_update_time: String,
     pub delete_time: Option<String>,
 }
-
 
 /// A list or collection of notes can be used to prioritize
 /// or collect various things into a group.
@@ -63,6 +60,7 @@ pub enum Tag {
     // Meta based
     RecommendedBy(String),
     RemindsMeOf(String),
+    Origin(String),
 }
 
 // API Interface
@@ -70,7 +68,6 @@ pub enum Tag {
 pub struct CreateNoteRequest {
     pub title: String,
     pub description: Option<String>,
-    pub origin: Option<String>,
     pub tags: Option<HashSet<Tag>>,
     pub owner: String,
 }
@@ -82,22 +79,22 @@ pub struct CreateNoteResponse {
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNoteRequest {
-    pub note_id: Uuid
+    pub note_id: Uuid,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNotesRequest {
-    pub owner : String
+    pub owner: String,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNotesResponse {
-    pub notes: HashMap<Uuid, Note>
+    pub notes: HashMap<Uuid, Note>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GetNoteResponse {
-    pub note: Note
+    pub note: Note,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
@@ -106,11 +103,14 @@ pub struct UpdateNoteRequest {
     pub note_id: Uuid,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub origin: Option<String>,
     pub tags: Option<HashSet<Tag>>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
-pub struct UpdateNoteResponse {
-    
+pub struct UpdateNoteResponse {}
+
+#[derive(Deserialize, Serialize)]
+pub struct FullList {
+    pub list: List,
+    pub notes_in_list: HashMap<Uuid, Note>,
 }

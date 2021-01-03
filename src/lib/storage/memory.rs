@@ -1,5 +1,5 @@
 use super::traits::NoteStore;
-use crate::lib::types::{List, Note};
+use crate::lib::types::{FullList, List, Note};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -46,6 +46,44 @@ impl NoteStore for MemoryNoteStore {
             .write()
             .unwrap()
             .insert(note.uuid.clone(), note);
+        Ok(())
+    }
+    fn get_lists(&self, owner: String) -> Result<HashMap<Uuid, List>> {
+        let mut map = HashMap::new();
+        let storage = self.list_storage.read().unwrap();
+        for list in storage.values() {
+            if list.owner == owner {
+                map.insert(list.uuid.clone(), list.clone());
+            }
+        }
+        Ok(map)
+    }
+    fn get_full_list(&self, id: Uuid) -> Result<FullList> {
+        let mut notes_in_list = HashMap::new();
+        let list = self
+            .list_storage
+            .read()
+            .unwrap()
+            .get(&id)
+            .context(format!("Looking for list with id {}", id))
+            .map(|x| x.clone())?;
+        for note_id in &list.notes {
+            // TODO --> What happens if I have a deleted note in a list?
+            let note = self
+                .get_note(*note_id)
+                .context("Looking for note in list")?;
+            notes_in_list.insert(note_id.clone(), note);
+        }
+        Ok(FullList {
+            list,
+            notes_in_list,
+        })
+    }
+    fn store_list(&mut self, list: List) -> Result<()> {
+        self.list_storage
+            .write()
+            .unwrap()
+            .insert(list.uuid.clone(), list);
         Ok(())
     }
 }

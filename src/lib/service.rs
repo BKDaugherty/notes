@@ -27,7 +27,6 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
             title: request.title,
             description: request.description,
             owner: request.owner,
-            origin: request.origin,
             tags: match request.tags {
                 Some(tags) => tags,
                 None => {
@@ -68,13 +67,15 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
             .get_note(request.note_id)
             .context("getting note to update")?;
 
-        // Make Updates
+        // Make Updates for all fields of UpdateNoteRequest
         if let Some(title) = request.title {
             note.title = title;
         }
-
         if let Some(description) = request.description {
             note.description = Some(description);
+        }
+        if let Some(tags) = request.tags {
+            note.tags = tags;
         }
         note.last_update_time = format!("{}", chrono::offset::Utc::now().timestamp());
         // Set note in storage
