@@ -1,4 +1,3 @@
-use diesel::deserialize::Queryable;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
@@ -12,8 +11,8 @@ pub struct Note {
     pub title: String,
     /// The owner of this note
     pub owner: String,
-    /// Optional description about this entry
-    pub description: Option<String>,
+    /// description about this entry
+    pub description: String,
     /// Tags assciated with this content
     pub tags: HashSet<Tag>,
     pub create_time: String,
@@ -33,8 +32,8 @@ pub struct List {
     pub title: String,
     /// The owner of this list
     pub owner: String,
-    /// Optional text that can provide any other information you'd like about this list
-    pub description: Option<String>,
+    /// text that can provide any other information you'd like about this list
+    pub description: String,
 }
 
 /// List of tags that can be associated with a Note
@@ -68,7 +67,7 @@ pub enum Tag {
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct CreateNoteRequest {
     pub title: String,
-    pub description: Option<String>,
+    pub description: String,
     pub tags: Option<HashSet<Tag>>,
     pub owner: String,
 }

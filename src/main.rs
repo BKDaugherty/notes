@@ -16,7 +16,7 @@ mod lib;
 arg_enum! {
     #[derive(StructOpt, PartialEq, Debug)]
     pub enum Storage {
-    Psql,
+	Psql,
         Memory,
     }
 }
@@ -28,7 +28,7 @@ arg_enum! {
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, default_value = "postgres://postgres@127.0.0.1:7878/notes")]
+    #[structopt(long, default_value = "postgres://postgres:postgres@127.0.0.1:5432/notes")]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]

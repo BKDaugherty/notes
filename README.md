@@ -11,15 +11,10 @@ Goodbye Apple Notes. You served your purpose well.
 
 
 ## TODO
-- Connect to notes-web
 - Implement Lists
+- Async Storage?
+- Setup heroku db
+  - Use password from environment?
 
-## Storage
-
-Get Note
-Store a note
-Get a list, and the associated notes with the list
-Store a new list
-Add a note to
 
 
