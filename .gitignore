@@ -1,2 +1,12 @@
+# Rust Builds
 /target
+
+# Emacs system files
 *~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
