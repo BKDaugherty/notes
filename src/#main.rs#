@@ -8,9 +8,6 @@ use log::info;
 use std::env;
 use structopt::StructOpt;
 
-#[macro_use]
-extern crate diesel;
-
 mod lib;
 
 arg_enum! {
@@ -28,7 +25,7 @@ arg_enum! {
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, env)]
+    #[structopt(long, default_value = "postgres://postgres@127.0.0.1:7878/notes")]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
@@ -36,7 +33,7 @@ struct Args {
     /// Port to listen on
     #[structopt(short, long, default_value = "9001")]
     port: u16,
-    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="psql")]
+    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="memory")]
     storage_type: Storage,
 }
 

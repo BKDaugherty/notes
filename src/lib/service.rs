@@ -88,7 +88,7 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
             note.title = title;
         }
         if let Some(description) = request.description {
-            note.description = Some(description);
+            note.description = description;
         }
         if let Some(tags) = request.tags {
             note.tags = tags;
