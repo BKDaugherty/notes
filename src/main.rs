@@ -28,7 +28,7 @@ arg_enum! {
 )]
 struct Args {
     /// Database URL to connect to
-    #[structopt(long, default_value = "postgres://postgres:postgres@127.0.0.1:5432/notes")]
+    #[structopt(long, env)]
     database_url: String,
     /// Make the logging loud and annoying
     #[structopt(short, long)]
@@ -36,7 +36,7 @@ struct Args {
     /// Port to listen on
     #[structopt(short, long, default_value = "9001")]
     port: u16,
-    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="memory")]
+    #[structopt(long, possible_values = &Storage::variants(), case_insensitive = true, default_value="psql")]
     storage_type: Storage,
 }
 
