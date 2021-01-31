@@ -46,6 +46,13 @@ pub enum Tag {
     Book,
     Movie,
     Music,
+    Series,
+    Podcast,
+    Recipe,
+    Restaurant,
+    Adventure,
+    VideoGame,
+    BoardGame,
 
     // Genre based
     Career,
@@ -56,6 +63,7 @@ pub enum Tag {
     ArtificialIntelligence,
     EffectiveAltruism,
     SocialJustice,
+    Environmental,
 
     // Meta based
     RecommendedBy(String),

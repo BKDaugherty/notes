@@ -31,9 +31,7 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
             tags: match request.tags {
                 Some(tags) => tags,
                 None => {
-                    let mut temp = HashSet::new();
-                    temp.insert(Tag::RecommendedBy("Brendon".to_string()));
-                    temp
+                    HashSet::new();
                 }
             },
             create_time: format!("{}", chrono::offset::Utc::now().timestamp()),
