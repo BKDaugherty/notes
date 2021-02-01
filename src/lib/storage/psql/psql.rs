@@ -1,7 +1,7 @@
-use super::models::{DBNote, NewNote};
+use super::models::{DBNote, NewNote, UpdateNote};
 use super::schema::notes;
 use crate::lib::storage::traits::NoteStore;
-use crate::lib::types::{FullList, List, Note};
+use crate::lib::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
 use anyhow::{anyhow, Context, Result};
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
@@ -38,7 +38,7 @@ impl PsqlNoteStore {
 impl NoteStore for PsqlNoteStore {
     fn get_note(&self, id: Uuid) -> Result<Note> {
         let conn = self.get_db_conn()?;
-	info!("Looking for note {}", id);
+        info!("Looking for note {}", id);
         let mut db_notes = notes::dsl::notes
             .filter(notes::dsl::uuid.eq(id.to_string()))
             .load::<DBNote>(&conn)
@@ -72,7 +72,7 @@ impl NoteStore for PsqlNoteStore {
         Ok(resulting_map)
     }
 
-    fn store_note(&mut self, note: Note) -> Result<()> {
+    fn create_note(&mut self, note: Note) -> Result<()> {
         let conn = self.get_db_conn()?;
         let note_uuid = note.uuid.clone();
         let new_note_request = NewNote::try_from(note).context(format!(
@@ -88,6 +88,29 @@ impl NoteStore for PsqlNoteStore {
             ))?;
         Ok(())
     }
+
+    fn update_note(&mut self, request: UpdateNoteRequest) -> Result<()> {
+        let note_id = request.note_id.clone();
+        let update = UpdateNote::try_from(request).context("converting update request")?;
+        let conn = self.get_db_conn()?;
+        diesel::update(notes::dsl::notes.filter(notes::dsl::uuid.eq(note_id.to_string())))
+            .set(&update)
+            .execute(&conn)
+            .context("Updating note")?;
+        Ok(())
+    }
+
+    fn archive_note(&mut self, request: ArchiveNoteRequest) -> Result<()> {
+        let note_id = request.note_id.clone();
+        let update = UpdateNote::from(request);
+        let conn = self.get_db_conn()?;
+        diesel::update(notes::dsl::notes.filter(notes::dsl::uuid.eq(note_id.to_string())))
+            .set(&update)
+            .execute(&conn)
+            .context("Updating note")?;
+        Ok(())
+    }
+
     fn get_full_list(&self, id: Uuid) -> Result<FullList> {
         todo!()
     }

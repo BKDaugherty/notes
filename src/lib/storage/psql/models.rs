@@ -1,5 +1,5 @@
 use super::schema::notes;
-use crate::lib::types::{Note, Tag};
+use crate::lib::types::{ArchiveNoteRequest, Note, Tag, UpdateNoteRequest};
 use anyhow::{anyhow, Context};
 use std::collections::HashSet;
 use std::convert::TryFrom;
@@ -43,7 +43,7 @@ impl TryFrom<DBNote> for Note {
             last_update_time: note.last_update_time,
             delete_time: note.delete_time,
             tags: tags,
-	    owner: note.owner,
+            owner: note.owner,
         })
     }
 }
@@ -61,6 +61,50 @@ pub struct NewNote {
     pub tags: Vec<String>,
 }
 
+#[derive(AsChangeset, Default)]
+#[table_name = "notes"]
+pub struct UpdateNote {
+    pub last_update_time: String,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub tags: Option<Vec<String>>,
+    pub delete_time: Option<String>,
+}
+
+impl TryFrom<UpdateNoteRequest> for UpdateNote {
+    type Error = anyhow::Error;
+    fn try_from(request: UpdateNoteRequest) -> Result<Self, Self::Error> {
+        let tag_update = match request.tags {
+            Some(tag_set) => {
+                let mut tags = Vec::new();
+                for tag in tag_set {
+                    tags.push(serde_json::to_string(&tag).context("serializing tag")?);
+                }
+                Some(tags)
+            }
+            None => None,
+        };
+        Ok(Self {
+            last_update_time: format!("{}", chrono::offset::Utc::now().timestamp()),
+            title: request.title,
+            description: request.description,
+            tags: tag_update,
+            delete_time: None,
+        })
+    }
+}
+
+impl From<ArchiveNoteRequest> for UpdateNote {
+    fn from(_request: ArchiveNoteRequest) -> Self {
+        let now = format!("{}", chrono::offset::Utc::now().timestamp());
+        Self {
+            last_update_time: now.clone(),
+            delete_time: Some(now),
+            ..Self::default()
+        }
+    }
+}
+
 impl TryFrom<Note> for NewNote {
     type Error = anyhow::Error;
     fn try_from(note: Note) -> Result<Self, Self::Error> {
@@ -75,7 +119,7 @@ impl TryFrom<Note> for NewNote {
             create_time: note.create_time,
             last_update_time: note.last_update_time,
             delete_time: note.delete_time,
-	    owner: note.owner,
+            owner: note.owner,
             tags,
         })
     }

@@ -1,5 +1,5 @@
 use super::traits::NoteStore;
-use crate::lib::types::{FullList, List, Note};
+use crate::lib::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -41,13 +41,42 @@ impl NoteStore for MemoryNoteStore {
         Ok(map)
     }
 
-    fn store_note(&mut self, note: Note) -> Result<()> {
+    fn create_note(&mut self, note: Note) -> Result<()> {
         self.note_storage
             .write()
             .unwrap()
             .insert(note.uuid.clone(), note);
         Ok(())
     }
+
+    fn update_note(&mut self, request: UpdateNoteRequest) -> Result<()> {
+        // Make Updates for all fields of UpdateNoteRequest
+        // Get note from storage
+        let mut note = self
+            .get_note(request.note_id)
+            .context("getting note to update")?;
+
+        if let Some(title) = request.title {
+            note.title = title;
+        }
+        if let Some(description) = request.description {
+            note.description = description;
+        }
+        if let Some(tags) = request.tags {
+            note.tags = tags.into();
+        }
+        note.last_update_time = format!("{}", chrono::offset::Utc::now().timestamp());
+        Ok(())
+    }
+
+    fn archive_note(&mut self, archive_request: ArchiveNoteRequest) -> Result<()> {
+        let mut note = self
+            .get_note(archive_request.note_id)
+            .context("getting note to update")?;
+        note.delete_time = Some(format!("{}", chrono::offset::Utc::now().timestamp()));
+        Ok(())
+    }
+
     fn get_lists(&self, owner: String) -> Result<HashMap<Uuid, List>> {
         let mut map = HashMap::new();
         let storage = self.list_storage.read().unwrap();

@@ -4,7 +4,7 @@ use crate::lib::types::{
     GetNoteResponse, GetNotesRequest, GetNotesResponse, Note, Tag, UpdateNoteRequest,
     UpdateNoteResponse,
 };
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use chrono;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -30,16 +30,14 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
             owner: request.owner,
             tags: match request.tags {
                 Some(tags) => tags,
-                None => {
-                    HashSet::new();
-                }
+                None => HashSet::new(),
             },
             create_time: format!("{}", chrono::offset::Utc::now().timestamp()),
             last_update_time: format!("{}", chrono::offset::Utc::now().timestamp()),
             delete_time: None,
         };
         self.storage
-            .store_note(note)
+            .create_note(note)
             .context("Attempting to store note")?;
         Ok(CreateNoteResponse { note_id: uuid })
     }
@@ -60,41 +58,16 @@ impl<S: NoteStore> NotesService for RequestHandler<S> {
     }
 
     fn archive_note(&mut self, request: ArchiveNoteRequest) -> Result<ArchiveNoteResponse> {
-        let mut note = self
-            .storage
-            .get_note(request.note_id)
-            .context("getting note to update")?;
-        if let Some(..) = note.delete_time {
-            return Err(anyhow!("Attempting to archive deleted note {:?}", note));
-        }
-        note.delete_time = Some(format!("{}", chrono::offset::Utc::now().timestamp()));
         self.storage
-            .store_note(note)
-            .context("Attempting to update note")?;
+            .archive_note(request)
+            .context("getting note to update")?;
         Ok(ArchiveNoteResponse {})
     }
 
     fn update_note(&mut self, request: UpdateNoteRequest) -> Result<UpdateNoteResponse> {
-        // Get note from storage
-        let mut note = self
-            .storage
-            .get_note(request.note_id)
-            .context("getting note to update")?;
-
-        // Make Updates for all fields of UpdateNoteRequest
-        if let Some(title) = request.title {
-            note.title = title;
-        }
-        if let Some(description) = request.description {
-            note.description = description;
-        }
-        if let Some(tags) = request.tags {
-            note.tags = tags;
-        }
-        note.last_update_time = format!("{}", chrono::offset::Utc::now().timestamp());
         // Set note in storage
         self.storage
-            .store_note(note)
+            .update_note(request)
             .context("Attempting to update note")?;
         Ok(UpdateNoteResponse {})
     }
