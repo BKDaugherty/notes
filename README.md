@@ -32,9 +32,9 @@ One particularly useful example is that of recommendations. With the `Recommende
 
 Here are some screenshots from the [prototype web app](https://github.com/BKDaugherty/notes-web) I built for this which shows some of the tags in action to give you and idea of how I use it.
 
-![example of some notes with tags in ui](docs/images/tags-example-0)
-![example of some notes with tags in ui using search](docs/images/tags-example-1)
-![example of some notes with tags in ui using a more complex search](docs/images/tags-example-2)
+![example of some notes with tags in ui](docs/images/tags-example-0.png)
+![example of some notes with tags in ui using search](docs/images/tags-example-1.png)
+![example of some notes with tags in ui using a more complex search](docs/images/tags-example-2.png)
 
 ## Develop
 
