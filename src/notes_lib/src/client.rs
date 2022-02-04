@@ -4,7 +4,7 @@ use async_trait::async_trait;
 
 // Currently the client is only used for importing my notes into Notion, so all I've implemented is get_notes.
 #[async_trait]
-trait Client {
+pub trait Client {
     async fn get_notes(&self, request: GetNotesRequest) -> Result<GetNotesResponse>;
 }
 
