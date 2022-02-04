@@ -1,5 +1,5 @@
 use super::traits::NoteStore;
-use crate::lib::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
+use crate::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};

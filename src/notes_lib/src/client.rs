@@ -1,4 +1,4 @@
-use crate::lib::types::{GetNotesRequest, GetNotesResponse};
+use crate::types::{GetNotesRequest, GetNotesResponse};
 use anyhow::Result;
 use async_trait::async_trait;
 

@@ -1,5 +1,5 @@
-use crate::lib::storage::NoteStore;
-use crate::lib::types::{
+use crate::storage::NoteStore;
+use crate::types::{
     ArchiveNoteRequest, ArchiveNoteResponse, CreateNoteRequest, CreateNoteResponse, GetNoteRequest,
     GetNoteResponse, GetNotesRequest, GetNotesResponse, Note, Tag, UpdateNoteRequest,
     UpdateNoteResponse,

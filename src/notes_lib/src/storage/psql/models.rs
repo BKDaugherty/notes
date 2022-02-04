@@ -1,5 +1,5 @@
-use super::schema::notes;
-use crate::lib::types::{ArchiveNoteRequest, Note, Tag, UpdateNoteRequest};
+use crate::storage::psql::schema::notes;
+use crate::types::{ArchiveNoteRequest, Note, Tag, UpdateNoteRequest};
 use anyhow::{anyhow, Context};
 use std::collections::HashSet;
 use std::convert::TryFrom;

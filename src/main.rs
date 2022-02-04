@@ -1,22 +1,17 @@
 use anyhow::{Context, Result};
 use clap::arg_enum;
 use env_logger::Env;
-use lib::routes::build_warp_routes;
-use lib::service::RequestHandler;
-use lib::storage::{MemoryNoteStore, PsqlNoteStore};
 use log::info;
+use notes_lib::routes::build_warp_routes;
+use notes_lib::service::RequestHandler;
+use notes_lib::storage::{MemoryNoteStore, PsqlNoteStore};
 use std::env;
 use structopt::StructOpt;
-
-#[macro_use]
-extern crate diesel;
-
-mod lib;
 
 arg_enum! {
     #[derive(StructOpt, PartialEq, Debug)]
     pub enum Storage {
-	Psql,
+    Psql,
         Memory,
     }
 }

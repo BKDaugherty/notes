@@ -1,4 +1,4 @@
-use crate::lib::types::{FullList, List, Note, UpdateNoteRequest, ArchiveNoteRequest};
+use crate::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
 use anyhow::Result;
 use std::collections::HashMap;
 use uuid::Uuid;

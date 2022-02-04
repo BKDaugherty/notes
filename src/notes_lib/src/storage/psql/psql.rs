@@ -1,7 +1,7 @@
 use super::models::{DBNote, NewNote, UpdateNote};
 use super::schema::notes;
-use crate::lib::storage::traits::NoteStore;
-use crate::lib::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
+use crate::storage::traits::NoteStore;
+use crate::types::{ArchiveNoteRequest, FullList, List, Note, UpdateNoteRequest};
 use anyhow::{anyhow, Context, Result};
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
