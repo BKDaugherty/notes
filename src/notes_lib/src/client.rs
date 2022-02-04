@@ -21,10 +21,10 @@ pub struct NotesClient {
 #[async_trait]
 impl Client for NotesClient {
     async fn get_notes(&self, request: GetNotesRequest) -> Result<GetNotesResponse> {
-        let resp = reqwest::get(format!("{}/notes/{}", self.endpoint, request.owner))
-            .await?
-            .json::<GetNotesResponse>()
-            .await;
+        let resp = reqwest::get(format!("{}/notes/{}", self.endpoint, request.owner)).await?;
+
+        println!("{:?}", resp);
+        let resp = resp.json::<GetNotesResponse>().await;
         Ok(resp?)
     }
 }

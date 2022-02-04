@@ -848,6 +848,7 @@ dependencies = [
  "notes_lib",
  "structopt",
  "tokio 1.16.1",
+ "tokio-compat-02",
  "warp",
 ]
 
@@ -1529,6 +1530,7 @@ dependencies = [
  "lazy_static",
  "memchr",
  "mio 0.6.23",
+ "num_cpus",
  "pin-project-lite 0.1.12",
  "slab",
 ]
@@ -1553,6 +1555,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-compat-02"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7d4237822b7be8fff0a7a27927462fad435dcb6650f95cea9e946bf6bdc7e07"
+dependencies = [
+ "bytes 0.5.6",
+ "once_cell",
+ "pin-project-lite 0.2.8",
+ "tokio 0.2.25",
+ "tokio 1.16.1",
+ "tokio-stream",
+]
+
+[[package]]
 name = "tokio-macros"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1570,6 +1586,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
+ "tokio 1.16.1",
+]
+
+[[package]]
+name = "tokio-stream"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50145484efff8818b5ccd256697f36863f587da82cf8b409c53adf1e840798e3"
+dependencies = [
+ "futures-core",
+ "pin-project-lite 0.2.8",
  "tokio 1.16.1",
 ]
 

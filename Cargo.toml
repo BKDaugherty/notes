@@ -14,4 +14,5 @@ log = "0.4"
 notes_lib = { path = "src/notes_lib" }
 structopt = { version = "0.3", default-features = false }
 tokio = { version = "1", features = ["full"] }
+tokio-compat-02 = "0.2"
 warp = "0.2"

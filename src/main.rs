@@ -7,6 +7,7 @@ use notes_lib::service::RequestHandler;
 use notes_lib::storage::{MemoryNoteStore, PsqlNoteStore};
 use std::env;
 use structopt::StructOpt;
+use tokio_compat_02::FutureExt;
 
 arg_enum! {
     #[derive(StructOpt, PartialEq, Debug)]
@@ -67,14 +68,14 @@ async fn main() -> Result<()> {
             let handler = RequestHandler::new(note_store);
             let routes = build_warp_routes(handler);
             info!("Running server on port {}", port);
-            warp::serve(routes).run(([0, 0, 0, 0], port)).await;
+            warp::serve(routes).run(([0, 0, 0, 0], port)).compat().await;
         }
         Storage::Memory => {
             info!("Using Memory Storage. Note, no notes will be saved!");
             let handler = RequestHandler::new(MemoryNoteStore::new());
             let routes = build_warp_routes(handler);
             info!("Running server on port {}", port);
-            warp::serve(routes).run(([0, 0, 0, 0], port)).await;
+            warp::serve(routes).run(([0, 0, 0, 0], port)).compat().await;
         }
     };
     Ok(())
